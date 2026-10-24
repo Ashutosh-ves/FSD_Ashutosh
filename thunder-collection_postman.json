@@ -1,0 +1,332 @@
+{
+    "info": {
+        "_postman_id": "59f3b15a-a090-4b1e-b14a-74bfaa5473b2",
+        "name": "FSD Exp 4",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "",
+        "item": [
+            {
+                "name": "1 - Setup",
+                "item": [
+                    {
+                        "name": "Home route - API running",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 200 OK, 'Event Management API Running'",
+                            "url": "http://localhost:5000/"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "2 - GET (Read)",
+                "item": [
+                    {
+                        "name": "GET all events",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 200 OK, JSON array of 3 events",
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "GET event by ID (1)",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 200 OK, Tech Fest 2026",
+                            "url": "http://localhost:5000/api/events/1"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "GET event by ID not found (99)",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 404 Not Found, 'Event not found'",
+                            "url": "http://localhost:5000/api/events/99"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "GET event by ID invalid (abc)",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 404 Not Found, 'Event not found' (Number('abc') is NaN)",
+                            "url": "http://localhost:5000/api/events/abc"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "3 - POST (Create)",
+                "item": [
+                    {
+                        "name": "POST create valid event",
+                        "request": {
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 201 Created, new event with id 4",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "GET created event (4) - verify",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 200 OK, Hackathon Kickoff. Run after the POST above.",
+                            "url": "http://localhost:5000/api/events/4"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "POST missing title",
+                        "request": {
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 400 Bad Request, 'Missing required fields: title'",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "POST invalid category (Sports)",
+                        "request": {
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 400 Bad Request, 'category must be one of: Tech, Design, Career'",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Sports\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "POST malformed JSON",
+                        "request": {
+                            "method": "POST",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 400 Bad Request, 'Malformed JSON in request body'",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": ",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "POST without JSON Content-Type (TRY)",
+                        "request": {
+                            "method": "POST",
+                            "header": [],
+                            "description": "Expected: 400 Bad Request, all six fields reported missing because req.body is undefined. Sent as plain text.",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "text"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "4 - PUT (Update)",
+                "item": [
+                    {
+                        "name": "PUT update event (4)",
+                        "request": {
+                            "method": "PUT",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 200 OK, 'Event updated successfully'. Run after the POST.",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events/4"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "PUT event not found (99)",
+                        "request": {
+                            "method": "PUT",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 404 Not Found, 'Event not found'",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"location\": \"Main Campus Ground\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events/99"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "PUT missing location",
+                        "request": {
+                            "method": "PUT",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "description": "Expected: 400 Bad Request, 'Missing required fields: location'",
+                            "body": {
+                                "mode": "raw",
+                                "raw": "{\"title\": \"Hackathon Kickoff\", \"description\": \"24-hour hackathon for building full-stack apps.\", \"date\": \"2 November 2026\", \"time\": \"09:00 AM\", \"category\": \"Tech\", \"status\": \"open\"}",
+                                "options": {
+                                    "raw": {
+                                        "language": "json"
+                                    }
+                                }
+                            },
+                            "url": "http://localhost:5000/api/events/4"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "5 - DELETE",
+                "item": [
+                    {
+                        "name": "DELETE event (4)",
+                        "request": {
+                            "method": "DELETE",
+                            "header": [],
+                            "description": "Expected: 200 OK, 'Event deleted successfully' with the deleted event",
+                            "url": "http://localhost:5000/api/events/4"
+                        },
+                        "response": []
+                    },
+                    {
+                        "name": "GET deleted event (4) - confirm removal",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 404 Not Found, 'Event not found'. Run after the DELETE.",
+                            "url": "http://localhost:5000/api/events/4"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "6 - Invalid requests",
+                "item": [
+                    {
+                        "name": "GET unknown route",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 404 Not Found, 'Route not found'",
+                            "url": "http://localhost:5000/api/nothing"
+                        },
+                        "response": []
+                    }
+                ]
+            },
+            {
+                "name": "7 - Frontend proxy check",
+                "item": [
+                    {
+                        "name": "GET events through Vite proxy",
+                        "request": {
+                            "method": "GET",
+                            "header": [],
+                            "description": "Expected: 200 OK, same array as GET all events. Requires the client running on port 5173.",
+                            "url": "http://localhost:5173/api/events"
+                        },
+                        "response": []
+                    }
+                ]
+            }
+        ]
+    }
+}
