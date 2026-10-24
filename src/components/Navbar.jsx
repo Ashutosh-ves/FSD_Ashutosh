@@ -1,12 +1,14 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { AuthContext } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
+import useRegistrations from "../hooks/useRegistrations";
 
 function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
 
-    const { user, logout } = useContext(AuthContext);
+    const { user, logout } = useAuth();
+    const { registeredIds } = useRegistrations();
 
     function closeMenu() {
         setMenuOpen(false);
@@ -23,37 +25,28 @@ function Navbar() {
             <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
                 {/* Logo */}
-                <Link
-                    to="/"
-                    onClick={closeMenu}
-                    className="text-2xl font-bold"
-                >
+                <Link to="/" onClick={closeMenu} className="text-2xl font-bold">
                     EventHub
                 </Link>
 
                 {/* Desktop Menu */}
                 <div className="hidden items-center gap-6 md:flex">
 
-                    <Link
-                        to="/"
-                        className="transition hover:text-indigo-400"
-                    >
+                    <Link to="/" className="transition hover:text-indigo-400">
                         Home
                     </Link>
 
-                    <Link
-                        to="/events"
-                        className="transition hover:text-indigo-400"
-                    >
+                    <Link to="/events" className="transition hover:text-indigo-400">
                         Events
                     </Link>
 
+                    <span className="rounded-full bg-indigo-600 px-3 py-1 text-sm">
+                        Registered: {registeredIds.length}
+                    </span>
+
                     {user ? (
                         <>
-                            <Link
-                                to="/my-registrations"
-                                className="transition hover:text-indigo-400"
-                            >
+                            <Link to="/my-registrations" className="transition hover:text-indigo-400">
                                 My Registrations
                             </Link>
 
@@ -70,10 +63,7 @@ function Navbar() {
                         </>
                     ) : (
                         <>
-                            <Link
-                                to="/login"
-                                className="transition hover:text-indigo-400"
-                            >
+                            <Link to="/login" className="transition hover:text-indigo-400">
                                 Login
                             </Link>
 
@@ -104,26 +94,21 @@ function Navbar() {
 
                     <div className="flex flex-col gap-4">
 
-                        <Link
-                            to="/"
-                            onClick={closeMenu}
-                        >
+                        <Link to="/" onClick={closeMenu}>
                             Home
                         </Link>
 
-                        <Link
-                            to="/events"
-                            onClick={closeMenu}
-                        >
+                        <Link to="/events" onClick={closeMenu}>
                             Events
                         </Link>
 
+                        <p className="text-sm text-slate-300">
+                            Registered: {registeredIds.length}
+                        </p>
+
                         {user ? (
                             <>
-                                <Link
-                                    to="/my-registrations"
-                                    onClick={closeMenu}
-                                >
+                                <Link to="/my-registrations" onClick={closeMenu}>
                                     My Registrations
                                 </Link>
 
@@ -140,17 +125,11 @@ function Navbar() {
                             </>
                         ) : (
                             <>
-                                <Link
-                                    to="/login"
-                                    onClick={closeMenu}
-                                >
+                                <Link to="/login" onClick={closeMenu}>
                                     Login
                                 </Link>
 
-                                <Link
-                                    to="/register"
-                                    onClick={closeMenu}
-                                >
+                                <Link to="/register" onClick={closeMenu}>
                                     Register
                                 </Link>
                             </>
