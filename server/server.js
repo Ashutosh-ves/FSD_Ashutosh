@@ -1,9 +1,12 @@
+require("dotenv").config();
+
 const express = require("express");
+const connectDB = require("./config/db");
 const eventRoutes = require("./routes/eventRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 
 // Middleware: parse JSON request bodies into req.body
 app.use(express.json());
@@ -24,6 +27,16 @@ app.use((req, res) => {
 // Error handler: must come last and take four parameters
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}`);
-});
+async function start() {
+    try {
+        await connectDB();
+        app.listen(PORT, () => {
+            console.log(`Server running at http://localhost:${PORT}`);
+        });
+    } catch (err) {
+        console.error("Failed to start server:", err.message);
+        process.exit(1);
+    }
+}
+
+start();

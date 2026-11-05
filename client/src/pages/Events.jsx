@@ -51,8 +51,8 @@ function Events() {
                         key={cat}
                         onClick={() => setCategory(cat)}
                         className={`rounded-full px-4 py-1.5 text-sm font-medium transition ${category === cat
-                                ? "bg-indigo-600 text-white"
-                                : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                            ? "bg-indigo-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                             }`}
                     >
                         {cat}
@@ -92,8 +92,8 @@ function Events() {
                         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 lg:gap-8">
                             {visibleEvents.map((event) => (
                                 <EventCard
-                                    key={event.id}
-                                    id={event.id}
+                                    key={event._id}
+                                    id={event._id}
                                     title={event.title}
                                     description={event.description}
                                     date={event.date}
