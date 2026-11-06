@@ -1,11 +1,9 @@
-import { useContext, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import useAuth from "../hooks/useAuth";
 
 function Login() {
-    const { login } = useContext(AuthContext);
-
+    const { login } = useAuth();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -14,59 +12,59 @@ function Login() {
     });
 
     const [message, setMessage] = useState("");
+    const [submitting, setSubmitting] = useState(false);
 
     function handleChange(event) {
         const { name, value } = event.target;
 
-        setFormData({
-            ...formData,
+        setFormData((previous) => ({
+            ...previous,
             [name]: value,
-        });
+        }));
     }
 
-    function handleSubmit(event) {
+    async function handleSubmit(event) {
         event.preventDefault();
+        setMessage("");
 
-        if (!formData.email || !formData.password) {
+        if (!formData.email.trim() || !formData.password) {
             setMessage("Please fill in all fields.");
             return;
         }
 
-        login(formData.email);
+        try {
+            setSubmitting(true);
+            const data = await login(formData.email, formData.password);
 
-        setMessage("Login successful!");
-
-        setTimeout(() => {
-            navigate("/");
-        }, 500);
+            // Redirect according to the role returned by the backend.
+            if (data.user.role === "admin") {
+                navigate("/admin");
+            } else {
+                navigate("/");
+            }
+        } catch (error) {
+            setMessage(error.message || "Login failed.");
+        } finally {
+            setSubmitting(false);
+        }
     }
 
     return (
         <div className="min-h-screen bg-slate-100 px-6 py-16">
-
             <div className="mx-auto max-w-md rounded-xl bg-white p-8 shadow-md">
+                <h1 className="text-3xl font-bold text-slate-900">Login</h1>
+                <p className="mt-2 text-slate-600">Login to manage your event registrations.</p>
 
-                <h1 className="text-3xl font-bold text-slate-900">
-                    Login
-                </h1>
-
-                <p className="mt-2 text-slate-600">
-                    Login to manage your event registrations.
-                </p>
-
-                <form
-                    onSubmit={handleSubmit}
-                    className="mt-6 space-y-4"
-                >
-
+                <form onSubmit={handleSubmit} className="mt-6 space-y-4">
                     <div>
-                        <label className="mb-1 block font-medium">
+                        <label htmlFor="login-email" className="mb-1 block font-medium">
                             Email
                         </label>
-
                         <input
+                            id="login-email"
                             type="email"
                             name="email"
+                            autoComplete="email"
                             value={formData.email}
                             onChange={handleChange}
                             placeholder="Enter your email"
@@ -75,13 +73,14 @@ function Login() {
                     </div>
 
                     <div>
-                        <label className="mb-1 block font-medium">
+                        <label htmlFor="login-password" className="mb-1 block font-medium">
                             Password
                         </label>
-
                         <input
+                            id="login-password"
                             type="password"
                             name="password"
+                            autoComplete="current-password"
                             value={formData.password}
                             onChange={handleChange}
                             placeholder="Enter your password"
@@ -91,21 +90,26 @@ function Login() {
 
                     <button
                         type="submit"
-                        className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700"
+                        disabled={submitting}
+                        className="w-full rounded-lg bg-indigo-600 px-4 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                        Login
+                        {submitting ? "Logging in..." : "Login"}
                     </button>
 
                     {message && (
-                        <p className="text-center font-semibold text-green-600">
+                        <p role="alert" className="text-center text-sm text-red-600">
                             {message}
                         </p>
                     )}
-
                 </form>
 
+                <p className="mt-5 text-center text-sm text-slate-600">
+                    Don't have an account?{" "}
+                    <Link to="/register" className="font-semibold text-indigo-600">
+                        Register
+                    </Link>
+                </p>
             </div>
-
         </div>
     );
 }

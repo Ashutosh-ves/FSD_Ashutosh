@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 import Home from "./pages/Home";
 import Events from "./pages/Events";
@@ -16,21 +17,26 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-
         <Route path="/events" element={<Events />} />
-
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
         <Route
           path="/my-registrations"
-          element={<MyRegistrations />}
+          element={
+            <ProtectedRoute>
+              <MyRegistrations />
+            </ProtectedRoute>
+          }
         />
 
         <Route
           path="/admin"
-          element={<AdminDashboard />}
+          element={
+            <ProtectedRoute requireAdmin>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
         />
       </Routes>
     </BrowserRouter>
