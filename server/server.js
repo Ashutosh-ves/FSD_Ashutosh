@@ -1,6 +1,8 @@
 require("dotenv").config();
 
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
@@ -8,6 +10,7 @@ const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const allowedOrigin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
 
 app.use(express.json());
 
@@ -15,19 +18,40 @@ app.get("/", (req, res) => {
     res.status(200).send("Event Management API Running");
 });
 
-// Authentication endpoints
-app.use("/api/auth", authRoutes);
+app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "ok" });
+});
 
-// Event endpoints
+app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
 
-// Unknown routes
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
 });
 
-// Error handler: must come last
 app.use(errorHandler);
+
+// One HTTP server shared by Express and Socket.IO
+const server = http.createServer(app);
+
+const io = new Server(server, {
+    cors: {
+        origin: allowedOrigin,
+        methods: ["GET", "POST"],
+    },
+});
+
+// Runs once for every client that connects
+io.on("connection", (socket) => {
+    console.log("Socket connected:", socket.id);
+
+    socket.on("disconnect", (reason) => {
+        console.log("Socket disconnected:", socket.id, reason);
+    });
+});
+
+// Makes io available in controllers as req.app.get("io")
+app.set("io", io);
 
 async function start() {
     try {
@@ -37,7 +61,7 @@ async function start() {
 
         await connectDB();
 
-        app.listen(PORT, () => {
+        server.listen(PORT, () => {
             console.log(`Server running at http://localhost:${PORT}`);
         });
     } catch (err) {

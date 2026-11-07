@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 import useAuth from "../hooks/useAuth";
 import useRegistrations from "../hooks/useRegistrations";
+import NotificationBell from "./NotificationBell";
 
 function Navbar() {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -77,6 +78,7 @@ function Navbar() {
                     )}
 
                 </div>
+                <NotificationBell />
 
                 {/* Mobile Menu Button */}
                 <button

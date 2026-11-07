@@ -17,6 +17,16 @@ function isValidId(id) {
     return /^[a-fA-F0-9]{24}$/.test(id);
 }
 
+// The part of an event that notifications include
+function eventSummary(event) {
+    return {
+        _id: event._id,
+        title: event.title,
+        date: event.date,
+        location: event.location,
+    };
+}
+
 // GET /api/events
 async function getEvents(req, res, next) {
     try {
@@ -52,6 +62,15 @@ async function getEventById(req, res, next) {
 async function createEvent(req, res, next) {
     try {
         const event = await Event.create(pickFields(req.body || {}));
+
+        // Notify connected clients only after the save succeeds
+        const io = req.app.get("io");
+        io.emit("event:created", {
+            message: `A new event has been added: ${event.title}`,
+            event: eventSummary(event),
+            createdAt: new Date(),
+        });
+
         res.status(201).json({ message: "Event created successfully", event });
     } catch (err) {
         next(err);
@@ -84,6 +103,14 @@ async function updateEvent(req, res, next) {
 
         await event.save();
 
+        // Notify connected clients only after the save succeeds
+        const io = req.app.get("io");
+        io.emit("event:updated", {
+            message: `An event has been updated: ${event.title}`,
+            event: eventSummary(event),
+            createdAt: new Date(),
+        });
+
         res.status(200).json({ message: "Event updated successfully", event });
     } catch (err) {
         next(err);
@@ -104,6 +131,14 @@ async function deleteEvent(req, res, next) {
         if (!event) {
             return res.status(404).json({ message: "Event not found" });
         }
+
+        // The technical name is event:deleted, but the user sees "cancelled"
+        const io = req.app.get("io");
+        io.emit("event:deleted", {
+            message: `An event has been cancelled: ${event.title}`,
+            event: { _id: event._id, title: event.title },
+            createdAt: new Date(),
+        });
 
         res.status(200).json({ message: "Event deleted successfully", event });
     } catch (err) {
