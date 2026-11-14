@@ -44,3 +44,8 @@ export function loginUser(credentials) {
 export function getCurrentUser() {
     return apiRequest("/auth/me");
 }
+
+// User profile API (used by the assignment)
+export function getUserProfile(userId) {
+    return apiRequest(`/users/${userId}`);
+}

@@ -6,6 +6,7 @@ const { Server } = require("socket.io");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const eventRoutes = require("./routes/eventRoutes");
+const userRoutes = require("./routes/userRoutes");
 const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
@@ -24,6 +25,7 @@ app.get("/api/health", (req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/events", eventRoutes);
+app.use("/api/users", userRoutes);
 
 app.use((req, res) => {
     res.status(404).json({ message: "Route not found" });
